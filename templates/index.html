@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,11 +8,12 @@
     <link rel="manifest" crossorigin="use-credentials" href="static/manifest.webmanifest" />
     <script src="https://kit.fontawesome.com/5b96244ab9.js" crossorigin="anonymous"></script>
     <style>
+        /* Dark Theme Styles */
         body {
             font-family: 'Montserrat', sans-serif;
             font-size: 14px;
-            background-color: #34495e;
-            color: #ecf0f1;
+            background-color: #1c2025;
+            color: #f8f9fa;
             margin: 0;
             padding: 0;
             display: flex;
@@ -26,9 +26,9 @@
             width: 100%;
             max-width: 800px;
             padding: 20px;
-            background-color: #2c3e50;
+            background-color: #2a2e33;
             border-radius: 8px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
         }
 
         .message {
@@ -36,58 +36,89 @@
             margin: 10px auto;
             padding: 10px;
             border-radius: 5px;
-            background-color: #465c71;
+            background-color: #3b4045;
         }
 
         #input-container {
-            margin-left: 25%;
             margin: auto;
-            width: 50%;
+            width: 90%;
             display: flex;
             flex-direction: row;
             margin-top: 20px;
         }
 
         #input-message {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 14px;
             width: 80%;
             height: 40px;
-            margin-right: 2%; /* Adjusted for better spacing */
+            margin-right: 2%;
             border: none;
             border-radius: 5px;
+            background-color: #4a4f55;
+            color: #ecf0f1;
+            padding: 8px;
             resize: none;
             overflow: auto;
-            max-height: 150px; /* Allowing it to expand up to 5 lines */
+            max-height: 150px;
         }
 
         #send-button:hover {
-            background-color: #2ecc71;
-        }
-
-        /* FontAwesome Icon styling */
-        .fa-paper-plane {
-            font-size: 1.2em;
+            background-color: #34c759;
         }
 
         #send-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px; /* Adjust width */
-            height: 40px; /* Set height to make it circular */
+            width: 40px;
+            height: 40px;
             cursor: pointer;
-            background-color: #27ae60;
+            background-color: #28a745;
             color: #fff;
             border: none;
             border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Adjusted FontAwesome Icon size */
         .fa-paper-plane {
             font-size: 1.4em;
         }
 
+        /* Tutorial Dialog Styles */
+        .tutorial-dialog {
+            position: absolute;
+            background-color: #2a2e33;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #34c759;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+
+        .arrow {
+            width: 15px;
+            height: 15px;
+            background-color: #2a2e33;
+            position: absolute;
+            transform: rotate(45deg);
+            border-top: 1px solid #34c759;
+            border-left: 1px solid #34c759;
+        }
+
+        /* Positioning arrows */
+        .arrow-top { bottom: -7.5px; left: 10px; }
+        .arrow-right { top: 10px; left: -7.5px; }
+        .arrow-bottom { top: -7.5px; left: 10px; }
+        .arrow-left { top: 10px; right: -7.5px; }
+
+        .tutorial-button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -95,13 +126,73 @@
         <div id="chat-messages"></div>
         <div id="input-container">
             <textarea id="input-message" placeholder="Type a message..." oninput="resizeTextarea()"></textarea>
-            <button id="send-button" onclick="sendMessage()"><i class="fa-regular fa-paper-plane"></i></button>
+            <button id="send-button" onclick="sendMessage()">
+                <i class="fa-regular fa-paper-plane"></i>
+            </button>
         </div>
     </div>
-
-    <!-- Add script for Socket.IO -->
-    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    <div class="tutorial-dialog" id="tutorial-dialog" style="display: none;">
+        <p id="dialog-text">Welcome to the Chat App</p>
+        <div class="arrow arrow-bottom" id="dialog-arrow"></div>
+        <button class="tutorial-button" onclick="nextTutorialStep()">Next</button>
+    </div>
+        <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
     <script>
+        // Tutorial Dialog JavaScript
+        const tutorialSteps = [
+            {
+                element: document.getElementById('input-message'),
+                text: 'Type your message here.',
+                arrowDirection: 'bottom'
+            },
+            {
+                element: document.getElementById('send-button'),
+                text: 'Click here to send your message.',
+                arrowDirection: 'left'
+            },
+            {
+                element: document.getElementById('chat-messages'),
+                text: 'Your messages and responses will appear here.',
+                arrowDirection: 'top'
+            }
+        ];
+        let currentStep = 0;
+
+        function showTutorialDialog() {
+            const step = tutorialSteps[currentStep];
+            const dialog = document.getElementById('tutorial-dialog');
+            const arrow = document.getElementById('dialog-arrow');
+            const text = document.getElementById('dialog-text');
+
+            text.innerText = step.text;
+
+            // Positioning the dialog and arrow
+            const rect = step.element.getBoundingClientRect();
+            dialog.style.display = 'block';
+            dialog.style.left = `${rect.left + (rect.width / 2) - (dialog.offsetWidth / 2)}px`;
+            dialog.style.top = `${rect.top + window.scrollY - dialog.offsetHeight - 10}px`;
+            arrow.className = `arrow arrow-${step.arrowDirection}`;
+
+            if (step.arrowDirection === 'top' || step.arrowDirection === 'bottom') {
+                arrow.style.left = `${dialog.offsetWidth / 2 - arrow.offsetWidth / 2}px`;
+            } else {
+                arrow.style.top = `${dialog.offsetHeight / 2 - arrow.offsetHeight / 2}px`;
+            }
+        }
+
+        function nextTutorialStep() {
+            currentStep++;
+            if (currentStep >= tutorialSteps.length) {
+                document.getElementById('tutorial-dialog').style.display = 'none';
+            } else {
+                showTutorialDialog();
+            }
+        }
+
+        // Display the first tutorial step on load
+        window.onload = () => {
+            showTutorialDialog();
+        };
         // Function to resize textarea
         function resizeTextarea() {
             const textarea = document.getElementById('input-message');
