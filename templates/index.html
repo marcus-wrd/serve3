@@ -181,7 +181,6 @@
         ];
         let currentStep = 0;
 
-
         function showTutorialDialog() {
             const step = tutorialSteps[currentStep];
             const dialog = document.getElementById('tutorial-dialog');
@@ -196,28 +195,28 @@
 
             switch(step.arrowDirection) {
                 case 'bottom-left':
-                    dialog.style.left = `${Math.max(20, rect.left - dialog.offsetWidth - 30)}px`;
-                    dialog.style.top = `${Math.min(window.innerHeight - dialog.offsetHeight - 20, rect.bottom + window.scrollY + 30)}px`;
-                    arrow.style.left = `${rect.left - 20}px`;
-                    arrow.style.top = `${rect.bottom + window.scrollY}px`;
+                    dialog.style.left = `${rect.left - dialog.offsetWidth - 10}px`;
+                    dialog.style.top = `${rect.bottom + window.scrollY + 10}px`;
+                    arrow.style.left = `${rect.left - 35}px`; // Adjusted arrow position
+                    arrow.style.top = `${rect.bottom + window.scrollY - 35}px`; // Adjusted arrow position
                     break;
                 case 'bottom-right':
-                    dialog.style.left = `${Math.min(window.innerWidth - dialog.offsetWidth - 20, rect.right + 30)}px`;
-                    dialog.style.top = `${Math.min(window.innerHeight - dialog.offsetHeight - 20, rect.bottom + window.scrollY + 30)}px`;
-                    arrow.style.left = `${rect.right}px`;
-                    arrow.style.top = `${rect.bottom + window.scrollY}px`;
+                    dialog.style.left = `${rect.right + 10}px`;
+                    dialog.style.top = `${rect.bottom + window.scrollY + 10}px`;
+                    arrow.style.left = `${rect.right - 35}px`; // Adjusted arrow position
+                    arrow.style.top = `${rect.bottom + window.scrollY - 35}px`; // Adjusted arrow position
                     break;
                 case 'top-right':
-                    dialog.style.left = `${Math.min(window.innerWidth - dialog.offsetWidth - 20, rect.right + 30)}px`;
-                    dialog.style.top = `${Math.max(20, rect.top + window.scrollY - dialog.offsetHeight - 30)}px`;
-                    arrow.style.left = `${rect.right}px`;
-                    arrow.style.top = `${rect.top + window.scrollY - 20}px`;
+                    dialog.style.left = `${rect.right + 10}px`;
+                    dialog.style.top = `${rect.top + window.scrollY - dialog.offsetHeight - 10}px`;
+                    arrow.style.left = `${rect.right - 35}px`; // Adjusted arrow position
+                    arrow.style.top = `${rect.top + window.scrollY - 35}px`; // Adjusted arrow position
                     break;
                 case 'top-left':
-                    dialog.style.left = `${Math.max(20, rect.left - dialog.offsetWidth - 30)}px`;
-                    dialog.style.top = `${Math.max(20, rect.top + window.scrollY - dialog.offsetHeight - 30)}px`;
-                    arrow.style.left = `${rect.left - 20}px`;
-                    arrow.style.top = `${rect.top + window.scrollY - 20}px`;
+                    dialog.style.left = `${rect.left - dialog.offsetWidth - 10}px`;
+                    dialog.style.top = `${rect.top + window.scrollY - dialog.offsetHeight - 10}px`;
+                    arrow.style.left = `${rect.left - 35}px`; // Adjusted arrow position
+                    arrow.style.top = `${rect.top + window.scrollY - 35}px`; // Adjusted arrow position
                     break;
             }
 
