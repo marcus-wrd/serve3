@@ -90,7 +90,6 @@
 
     </style>
 </head>
-
 <body>
     <div id="chat-container">
         <div id="chat-messages"></div>
@@ -99,18 +98,37 @@
             <button id="send-button" onclick="sendMessage()"><i class="fa-regular fa-paper-plane"></i></button>
         </div>
     </div>
+
+    <!-- Add script for Socket.IO -->
+    <script src="https://cdn.socket.io/socket.io-3.1.3.min.js"></script>
     <script>
         // Function to resize textarea
         function resizeTextarea() {
             const textarea = document.getElementById('input-message');
             textarea.style.height = 'auto'; 
-            if(textarea.scrollHeight <= 90) { // Allowing it to expand up to 5 lines
+            if(textarea.scrollHeight <= 90) { 
                 textarea.style.height = textarea.scrollHeight + 'px';
             } else {
-                textarea.style.height = '90px'; // After 5 lines, restrict to 90px
+                textarea.style.height = '90px';
             }
         }
-        async function sendMessage() {
+
+        // Initialize WebSocket connection
+        const socket = io();
+
+        // Function to handle incoming chunks
+        function handleChunk(data) {
+            const chatMessages = document.getElementById('chat-messages');
+            const newMessage = document.createElement('div');
+            newMessage.className = 'message';
+            newMessage.innerHTML = `Glance: ${data.output}`;
+            chatMessages.appendChild(newMessage);
+        }
+
+        // Listen for chunks from the server
+        socket.on('chunk', handleChunk);
+
+        function sendMessage() {
             const inputElement = document.getElementById('input-message');
             const message = inputElement.value;
             inputElement.value = '';
@@ -119,51 +137,13 @@
             const chatMessages = document.getElementById('chat-messages');
             chatMessages.innerHTML += `<div class="message">User: ${message}</div>`;
 
-            // Display loading message with typewriter effect
-            let loadingMessage = 'Glance: Loading';
-            const loadingElement = document.createElement('div');
-            loadingElement.className = 'message';
-            chatMessages.appendChild(loadingElement);
-
-            for (let i = 0; i < 4; i++) {
-                loadingElement.innerHTML = `${loadingMessage}${'.'.repeat(i)}`;
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-            loadingElement.innerHTML += " (About to fetch!)"
-            // Send the message to the server and get the response
-            const response = await fetch('/generate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ prompt: `${message}` })
-            });
-            const data = await response.json();
-
-            // Remove loading message
-            loadingElement.remove();
-
-            // Display glance's response with a typing effect
-            let output = '';
-            const responseElement = document.createElement('div');
-            responseElement.className = 'message';
-            chatMessages.appendChild(responseElement);
-
-            dataoutput = data.output.replace(/(?:\r\n|\r|\n)/g, ' <br> ');
-            
-            // Split the output into words
-            const words = dataoutput.split(' ');
-
-            for (const word of words) {
-                output += word + ' ';
-                responseElement.innerHTML = `Glance: ${output}`;
-                await new Promise(resolve => setTimeout(resolve, 1000/words.length)); // Adjust delay as needed
-            }
+            // Emit the prompt to the WebSocket
+            socket.emit('generate', { prompt: `${message}` });
         }
+
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("static/generate-sw.js");
         }
     </script>
 </body>
-
 </html>
