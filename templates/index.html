@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="manifest" crossorigin="use-credentials" href="static/manifest.webmanifest" />
+    <script src="https://kit.fontawesome.com/5b96244ab9.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            background-color: #34495e;
+            color: #ecf0f1;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        #chat-container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            background-color: #2c3e50;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .message {
+            width: 90%;
+            margin: 10px auto;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #465c71;
+        }
+
+        #input-container {
+            margin-left: 25%;
+            margin: auto;
+            width: 50%;
+            display: flex;
+            flex-direction: row;
+            margin-top: 20px;
+        }
+
+        #input-message {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            width: 80%;
+            height: 40px;
+            margin-right: 2%; /* Adjusted for better spacing */
+            border: none;
+            border-radius: 5px;
+            resize: none;
+            overflow: auto;
+            max-height: 150px; /* Allowing it to expand up to 5 lines */
+        }
+
+        #send-button:hover {
+            background-color: #2ecc71;
+        }
+
+        /* FontAwesome Icon styling */
+        .fa-paper-plane {
+            font-size: 1.2em;
+        }
+
+        #send-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px; /* Adjust width */
+            height: 40px; /* Set height to make it circular */
+            cursor: pointer;
+            background-color: #27ae60;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+        }
+
+        /* Adjusted FontAwesome Icon size */
+        .fa-paper-plane {
+            font-size: 1.4em;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="chat-container">
+        <div id="chat-messages"></div>
+        <div id="input-container">
+            <textarea id="input-message" placeholder="Type a message..." oninput="resizeTextarea()"></textarea>
+            <button id="send-button" onclick="sendMessage()"><i class="fa-regular fa-paper-plane"></i></button>
+        </div>
+    </div>
+    <script>
+        // Function to resize textarea
+        function resizeTextarea() {
+            const textarea = document.getElementById('input-message');
+            textarea.style.height = 'auto'; 
+            if(textarea.scrollHeight <= 90) { // Allowing it to expand up to 5 lines
+                textarea.style.height = textarea.scrollHeight + 'px';
+            } else {
+                textarea.style.height = '90px'; // After 5 lines, restrict to 90px
+            }
+        }
+        async function sendMessage() {
+            const inputElement = document.getElementById('input-message');
+            const message = inputElement.value;
+            inputElement.value = '';
+
+            // Display the user's message
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML += `<div class="message">User: ${message}</div>`;
+
+            // Display loading message with typewriter effect
+            let loadingMessage = 'Glance: Loading';
+            const loadingElement = document.createElement('div');
+            loadingElement.className = 'message';
+            chatMessages.appendChild(loadingElement);
+
+            for (let i = 0; i < 4; i++) {
+                loadingElement.innerHTML = `${loadingMessage}${'.'.repeat(i)}`;
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            loadingElement.innerHTML += " (About to fetch!)"
+            // Send the message to the server and get the response
+            const response = await fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ prompt: `${message}` })
+            });
+            const data = await response.json();
+
+            // Remove loading message
+            loadingElement.remove();
+
+            // Display glance's response with a typing effect
+            let output = '';
+            const responseElement = document.createElement('div');
+            responseElement.className = 'message';
+            chatMessages.appendChild(responseElement);
+
+            dataoutput = data.output.replace(/(?:\r\n|\r|\n)/g, ' <br> ');
+            
+            // Split the output into words
+            const words = dataoutput.split(' ');
+
+            for (const word of words) {
+                output += word + ' ';
+                responseElement.innerHTML = `Glance: ${output}`;
+                await new Promise(resolve => setTimeout(resolve, 1000/words.length)); // Adjust delay as needed
+            }
+        }
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("static/generate-sw.js");
+        }
+    </script>
+</body>
+
+</html>
