@@ -181,6 +181,7 @@
         ];
         let currentStep = 0;
 
+
         function showTutorialDialog() {
             const step = tutorialSteps[currentStep];
             const dialog = document.getElementById('tutorial-dialog');
@@ -195,26 +196,26 @@
 
             switch(step.arrowDirection) {
                 case 'bottom-left':
-                    dialog.style.left = `${rect.left - dialog.offsetWidth - 30}px`;
-                    dialog.style.top = `${rect.bottom + window.scrollY + 30}px`;
+                    dialog.style.left = `${Math.max(20, rect.left - dialog.offsetWidth - 30)}px`;
+                    dialog.style.top = `${Math.min(window.innerHeight - dialog.offsetHeight - 20, rect.bottom + window.scrollY + 30)}px`;
                     arrow.style.left = `${rect.left - 20}px`;
                     arrow.style.top = `${rect.bottom + window.scrollY}px`;
                     break;
                 case 'bottom-right':
-                    dialog.style.left = `${rect.right + 30}px`;
-                    dialog.style.top = `${rect.bottom + window.scrollY + 30}px`;
+                    dialog.style.left = `${Math.min(window.innerWidth - dialog.offsetWidth - 20, rect.right + 30)}px`;
+                    dialog.style.top = `${Math.min(window.innerHeight - dialog.offsetHeight - 20, rect.bottom + window.scrollY + 30)}px`;
                     arrow.style.left = `${rect.right}px`;
                     arrow.style.top = `${rect.bottom + window.scrollY}px`;
                     break;
                 case 'top-right':
-                    dialog.style.left = `${rect.right + 30}px`;
-                    dialog.style.top = `${rect.top + window.scrollY - dialog.offsetHeight - 30}px`;
+                    dialog.style.left = `${Math.min(window.innerWidth - dialog.offsetWidth - 20, rect.right + 30)}px`;
+                    dialog.style.top = `${Math.max(20, rect.top + window.scrollY - dialog.offsetHeight - 30)}px`;
                     arrow.style.left = `${rect.right}px`;
                     arrow.style.top = `${rect.top + window.scrollY - 20}px`;
                     break;
                 case 'top-left':
-                    dialog.style.left = `${rect.left - dialog.offsetWidth - 30}px`;
-                    dialog.style.top = `${rect.top + window.scrollY - dialog.offsetHeight - 30}px`;
+                    dialog.style.left = `${Math.max(20, rect.left - dialog.offsetWidth - 30)}px`;
+                    dialog.style.top = `${Math.max(20, rect.top + window.scrollY - dialog.offsetHeight - 30)}px`;
                     arrow.style.left = `${rect.left - 20}px`;
                     arrow.style.top = `${rect.top + window.scrollY - 20}px`;
                     break;
