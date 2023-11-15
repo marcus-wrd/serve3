@@ -116,13 +116,16 @@
         // Initialize WebSocket connection
         const socket = io();
 
+        let responseElement;
+
         // Function to handle incoming chunks
         function handleChunk(data) {
-            const chatMessages = document.getElementById('chat-messages');
-            const newMessage = document.createElement('div');
-            newMessage.className = 'message';
-            newMessage.innerHTML = `Glance: ${data.output}`;
-            chatMessages.appendChild(newMessage);
+            if (!responseElement) {
+                responseElement = document.createElement('div');
+                responseElement.className = 'message';
+                document.getElementById('chat-messages').appendChild(responseElement);
+            }
+            responseElement.innerHTML = `Glance: ${data.output}`;
         }
 
         // Listen for chunks from the server
@@ -136,6 +139,9 @@
             // Display the user's message
             const chatMessages = document.getElementById('chat-messages');
             chatMessages.innerHTML += `<div class="message">User: ${message}</div>`;
+
+            // Reset the response element for new messages
+            responseElement = null;
 
             // Emit the prompt to the WebSocket
             socket.emit('generate', { prompt: `${message}` });
