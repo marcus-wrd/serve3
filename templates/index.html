@@ -125,7 +125,7 @@
                 responseElement.className = 'message';
                 document.getElementById('chat-messages').appendChild(responseElement);
             }
-            responseElement.innerHTML = `Glance: ${data.output}`;
+            responseElement.innerHTML += `${data.output}`;
         }
 
         // Listen for chunks from the server
