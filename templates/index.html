@@ -48,6 +48,7 @@
         }
 
         #input-message {
+            font-family: 'Montserrat', sans-serif; /* Montserrat font for textarea */
             width: 80%;
             height: 40px;
             margin-right: 2%;
@@ -94,21 +95,29 @@
             z-index: 100;
         }
 
+        /* Arrow with Line */
         .arrow {
-            width: 15px;
-            height: 15px;
-            background-color: #2a2e33;
             position: absolute;
-            transform: rotate(45deg);
-            border-top: 1px solid #34c759;
-            border-left: 1px solid #34c759;
+            width: 100px; /* Line length */
+            height: 2px; /* Line thickness */
+            background-color: #34c759;
+            z-index: 101;
         }
 
-        /* Positioning arrows */
-        .arrow-top { bottom: -7.5px; left: 10px; }
-        .arrow-right { top: 10px; left: -7.5px; }
-        .arrow-bottom { top: -7.5px; left: 10px; }
-        .arrow-left { top: 10px; right: -7.5px; }
+        .arrow::after {
+            content: '';
+            position: absolute;
+            top: -5px; /* Adjust the position of the arrowhead */
+            right: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-top: 10px solid #34c759; /* Arrowhead color */
+        }
+
+        .arrow-top { bottom: 100%; left: 50%; transform: translateX(-50%); }
+        .arrow-right { top: 50%; left: 100%; transform: translateY(-50%) rotate(90deg); }
+        .arrow-bottom { top: 100%; left: 50%; transform: translateX(-50%); }
+        .arrow-left { top: 50%; right: 100%; transform: translateY(-50%) rotate(90deg); }
 
         .tutorial-button {
             background-color: #28a745;
@@ -136,14 +145,14 @@
         <div class="arrow arrow-bottom" id="dialog-arrow"></div>
         <button class="tutorial-button" onclick="nextTutorialStep()">Next</button>
     </div>
-        <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
     <script>
         // Tutorial Dialog JavaScript
         const tutorialSteps = [
             {
                 element: document.getElementById('input-message'),
                 text: 'Type your message here.',
-                arrowDirection: 'bottom'
+                arrowDirection: 'top'
             },
             {
                 element: document.getElementById('send-button'),
@@ -153,7 +162,7 @@
             {
                 element: document.getElementById('chat-messages'),
                 text: 'Your messages and responses will appear here.',
-                arrowDirection: 'top'
+                arrowDirection: 'bottom'
             }
         ];
         let currentStep = 0;
@@ -170,13 +179,16 @@
             const rect = step.element.getBoundingClientRect();
             dialog.style.display = 'block';
             dialog.style.left = `${rect.left + (rect.width / 2) - (dialog.offsetWidth / 2)}px`;
-            dialog.style.top = `${rect.top + window.scrollY - dialog.offsetHeight - 10}px`;
+            dialog.style.top = `${rect.top + window.scrollY - dialog.offsetHeight - 30}px`; // Adjusted for better positioning
             arrow.className = `arrow arrow-${step.arrowDirection}`;
 
+            // Adjust arrow position
             if (step.arrowDirection === 'top' || step.arrowDirection === 'bottom') {
-                arrow.style.left = `${dialog.offsetWidth / 2 - arrow.offsetWidth / 2}px`;
+                arrow.style.left = `${rect.left + (rect.width / 2) - 50}px`; // Center the arrow
+                arrow.style.top = `${rect.top + window.scrollY - (step.arrowDirection === 'top' ? 120 : dialog.offsetHeight + 30)}px`;
             } else {
-                arrow.style.top = `${dialog.offsetHeight / 2 - arrow.offsetHeight / 2}px`;
+                arrow.style.top = `${rect.top + window.scrollY + (rect.height / 2) - 1}px`; // Center the arrow vertically
+                arrow.style.left = `${rect.left + (step.arrowDirection === 'left' ? -100 : rect.width)}px`;
             }
         }
 
@@ -193,6 +205,7 @@
         window.onload = () => {
             showTutorialDialog();
         };
+        
         // Function to resize textarea
         function resizeTextarea() {
             const textarea = document.getElementById('input-message');
