@@ -193,30 +193,31 @@
             const rect = step.element.getBoundingClientRect();
             dialog.style.display = 'block';
 
+            const arrowSize = 35; // Assuming the diagonal length of arrow is 35px
             switch(step.arrowDirection) {
                 case 'bottom-left':
                     dialog.style.left = `${rect.left - dialog.offsetWidth - 10}px`;
                     dialog.style.top = `${rect.bottom + window.scrollY + 10}px`;
-                    arrow.style.left = `${rect.left - 35}px`; // Adjusted arrow position
-                    arrow.style.top = `${rect.bottom + window.scrollY - 35}px`; // Adjusted arrow position
+                    arrow.style.left = `${rect.left - arrowSize}px`;
+                    arrow.style.top = `${rect.bottom + window.scrollY - arrowSize / 2}px`;
                     break;
                 case 'bottom-right':
                     dialog.style.left = `${rect.right + 10}px`;
                     dialog.style.top = `${rect.bottom + window.scrollY + 10}px`;
-                    arrow.style.left = `${rect.right - 35}px`; // Adjusted arrow position
-                    arrow.style.top = `${rect.bottom + window.scrollY - 35}px`; // Adjusted arrow position
+                    arrow.style.left = `${rect.right - arrowSize / 2}px`;
+                    arrow.style.top = `${rect.bottom + window.scrollY - arrowSize / 2}px`;
                     break;
                 case 'top-right':
                     dialog.style.left = `${rect.right + 10}px`;
                     dialog.style.top = `${rect.top + window.scrollY - dialog.offsetHeight - 10}px`;
-                    arrow.style.left = `${rect.right - 35}px`; // Adjusted arrow position
-                    arrow.style.top = `${rect.top + window.scrollY - 35}px`; // Adjusted arrow position
+                    arrow.style.left = `${rect.right - arrowSize / 2}px`;
+                    arrow.style.top = `${rect.top + window.scrollY - arrowSize}px`;
                     break;
                 case 'top-left':
                     dialog.style.left = `${rect.left - dialog.offsetWidth - 10}px`;
                     dialog.style.top = `${rect.top + window.scrollY - dialog.offsetHeight - 10}px`;
-                    arrow.style.left = `${rect.left - 35}px`; // Adjusted arrow position
-                    arrow.style.top = `${rect.top + window.scrollY - 35}px`; // Adjusted arrow position
+                    arrow.style.left = `${rect.left - arrowSize}px`;
+                    arrow.style.top = `${rect.top + window.scrollY - arrowSize}px`;
                     break;
             }
 
