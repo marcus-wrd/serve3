@@ -124,6 +124,7 @@
                 responseElement = document.createElement('div');
                 responseElement.className = 'message';
                 document.getElementById('chat-messages').appendChild(responseElement);
+                responseElement.innerHTML += `Glance: `;
             }
             responseElement.innerHTML += `${data.output}`;
         }
