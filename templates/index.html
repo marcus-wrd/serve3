@@ -95,42 +95,6 @@
             z-index: 100;
         }
 
-        /* Arrow with a line */
-        .arrow {
-            position: absolute;
-            width: 50px; /* Adjust line length */
-            height: 2px; /* Line thickness */
-            background-color: #34c759;
-            z-index: 101;
-        }
-
-        .arrow::after {
-            content: '';
-            position: absolute;
-            top: -5px;
-            right: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 7px solid #34c759; /* Arrowhead color */
-        }
-
-        /* Arrow position adjustments */
-        .arrow-top { 
-            transform: translateX(-50%);
-            transform-origin: bottom center;
-        }
-        .arrow-right {
-            transform: translateY(-50%) rotate(90deg);
-            transform-origin: top left;
-        }
-        .arrow-bottom {
-            transform: translateX(-50%);
-            transform-origin: top center;
-        }
-        .arrow-left {
-            transform: translateY(-50%) rotate(-90deg);
-            transform-origin: top right;
-        }
 
         .tutorial-button {
             background-color: #28a745;
@@ -140,6 +104,42 @@
             border-radius: 4px;
             cursor: pointer;
             margin-top: 10px;
+        }
+        .arrow {
+            position: absolute;
+            width: 70px; /* Adjust line length */
+            height: 70px; /* Adjust line width for diagonal */
+            background-color: transparent;
+            border-top: 2px solid #34c759; /* Line color */
+            border-right: 2px solid #34c759; /* Line color */
+            z-index: 101;
+        }
+
+        .arrow::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            border-left: 5px solid transparent;
+            border-top: 5px solid #34c759; /* Arrowhead color */
+        }
+
+        /* Arrow position adjustments for diagonal */
+        .arrow-top-left {
+            transform: rotate(135deg);
+            transform-origin: bottom right;
+        }
+        .arrow-top-right {
+            transform: rotate(45deg);
+            transform-origin: bottom left;
+        }
+        .arrow-bottom-right {
+            transform: rotate(-45deg);
+            transform-origin: top left;
+        }
+        .arrow-bottom-left {
+            transform: rotate(-135deg);
+            transform-origin: top right;
         }
     </style>
 </head>
@@ -155,27 +155,26 @@
     </div>
     <div class="tutorial-dialog" id="tutorial-dialog" style="display: none;">
         <p id="dialog-text">Welcome to the Chat App</p>
-        <div class="arrow arrow-bottom" id="dialog-arrow"></div>
+        <div class="arrow arrow-bottom-left" id="dialog-arrow"></div>
         <button class="tutorial-button" onclick="nextTutorialStep()">Next</button>
     </div>
-    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
     <script>
         // Tutorial Dialog JavaScript
         const tutorialSteps = [
             {
                 element: document.getElementById('input-message'),
                 text: 'Type your message here.',
-                arrowDirection: 'top'
+                arrowDirection: 'bottom-left'
             },
             {
                 element: document.getElementById('send-button'),
                 text: 'Click here to send your message.',
-                arrowDirection: 'left'
+                arrowDirection: 'bottom-left'
             },
             {
                 element: document.getElementById('chat-messages'),
                 text: 'Your messages and responses will appear here.',
-                arrowDirection: 'bottom'
+                arrowDirection: 'top-right'
             }
         ];
         let currentStep = 0;
@@ -193,29 +192,29 @@
             dialog.style.display = 'block';
 
             switch(step.arrowDirection) {
-                case 'top':
-                    dialog.style.left = `${rect.left + rect.width / 2 - dialog.offsetWidth / 2}px`;
-                    dialog.style.top = `${rect.top + window.scrollY - dialog.offsetHeight - 70}px`;
-                    arrow.style.left = `${rect.left + rect.width / 2}px`;
-                    arrow.style.top = `${rect.top + window.scrollY - 50}px`;
-                    break;
-                case 'right':
-                    dialog.style.left = `${rect.right + 20}px`;
-                    dialog.style.top = `${rect.top + window.scrollY + rect.height / 2 - dialog.offsetHeight / 2}px`;
-                    arrow.style.left = `${rect.right}px`;
-                    arrow.style.top = `${rect.top + window.scrollY + rect.height / 2}px`;
-                    break;
-                case 'bottom':
-                    dialog.style.left = `${rect.left + rect.width / 2 - dialog.offsetWidth / 2}px`;
-                    dialog.style.top = `${rect.bottom + window.scrollY + 20}px`;
-                    arrow.style.left = `${rect.left + rect.width / 2}px`;
+                case 'bottom-left':
+                    dialog.style.left = `${rect.left - dialog.offsetWidth - 30}px`;
+                    dialog.style.top = `${rect.bottom + window.scrollY + 30}px`;
+                    arrow.style.left = `${rect.left - 20}px`;
                     arrow.style.top = `${rect.bottom + window.scrollY}px`;
                     break;
-                case 'left':
-                    dialog.style.left = `${rect.left - dialog.offsetWidth - 70}px`;
-                    dialog.style.top = `${rect.top + window.scrollY + rect.height / 2 - dialog.offsetHeight / 2}px`;
-                    arrow.style.left = `${rect.left - 50}px`;
-                    arrow.style.top = `${rect.top + window.scrollY + rect.height / 2}px`;
+                case 'bottom-right':
+                    dialog.style.left = `${rect.right + 30}px`;
+                    dialog.style.top = `${rect.bottom + window.scrollY + 30}px`;
+                    arrow.style.left = `${rect.right}px`;
+                    arrow.style.top = `${rect.bottom + window.scrollY}px`;
+                    break;
+                case 'top-right':
+                    dialog.style.left = `${rect.right + 30}px`;
+                    dialog.style.top = `${rect.top + window.scrollY - dialog.offsetHeight - 30}px`;
+                    arrow.style.left = `${rect.right}px`;
+                    arrow.style.top = `${rect.top + window.scrollY - 20}px`;
+                    break;
+                case 'top-left':
+                    dialog.style.left = `${rect.left - dialog.offsetWidth - 30}px`;
+                    dialog.style.top = `${rect.top + window.scrollY - dialog.offsetHeight - 30}px`;
+                    arrow.style.left = `${rect.left - 20}px`;
+                    arrow.style.top = `${rect.top + window.scrollY - 20}px`;
                     break;
             }
 
