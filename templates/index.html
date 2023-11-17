@@ -152,6 +152,10 @@
             <button id="send-button" onclick="sendMessage()">
                 <i class="fa-regular fa-paper-plane"></i>
             </button>
+            <input type="file" id="file-picker" accept="application/pdf" style="display:none;" onchange="handleFileUpload(event)">
+            <label for="file-picker">
+                <i class="fa fa-upload"></i> Summarize from PDF
+            </label>
         </div>
     </div>
     <div class="tutorial-dialog" id="tutorial-dialog" style="display: none;">
@@ -159,6 +163,7 @@
         <div class="arrow arrow-bottom-left" id="dialog-arrow"></div>
         <button class="tutorial-button" onclick="nextTutorialStep()">Next</button>
     </div>
+    
     <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
     <script>
         // Tutorial Dialog JavaScript
@@ -283,6 +288,19 @@
             // Emit the prompt to the WebSocket
             socket.emit('generate', { prompt: `${message}` });
         }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const fileContent = e.target.result;
+                    socket.emit('ocrgenerate', { file: fileContent });
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        }
+
 
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("static/generate-sw.js");
