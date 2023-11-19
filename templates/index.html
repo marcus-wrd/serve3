@@ -282,42 +282,31 @@
         
         function handleChunk(data) {
             // Append incoming chunk to the buffer
-            messageBuffer += data.output;
+            responseBuffer += data.output;
+        
             if (!responseElement) {
-                // Display non-code block messages with 'Bot: ' tag
-                const chatMessages = document.getElementById('chat-messages');
                 responseElement = document.createElement('div');
                 responseElement.className = 'message';
-                chatMessages.appendChild(responseElement);
-                responseElement.innerHTML += `<strong>Bot: </strong>: `;
-                if (/```(\w+)\n([\s\S]+?)```/g.test(messageBuffer)) {
-                    const regex = /```(\w+)\n([\s\S]+?)```/g;
-                    messageBuffer = messageBuffer.replace(regex, (match, language, code) => {
-                        return formatCodeBlock(language, code);
-                    }).replace(/\n/g, '<br>');
-                
-                    const chatMessages = document.getElementById('chat-messages');
-                    responseElement.innerHTML += `${messageBuffer}`;
-                    messageBuffer = '';
-                } else {
-                    responseElement.innerHTML += `${escapeHTML(data.output)}`;
-                    messageBuffer = ''; // Clear the buffer
-                }
-            } else {
-                if (/```(\w+)\n([\s\S]+?)```/g.test(messageBuffer)) {
-                    const regex = /```(\w+)\n([\s\S]+?)```/g;
-                    messageBuffer = messageBuffer.replace(regex, (match, language, code) => {
-                        return formatCodeBlock(language, code);
-                    }).replace(/\n/g, '<br>');
-                
-                    const chatMessages = document.getElementById('chat-messages');
-                    responseElement.innerHTML += `${messageBuffer}`;
-                    messageBuffer = '';
-                } else {
-                    responseElement.innerHTML += `${escapeHTML(data.output)}`;
-                }
+                responseElement.innerHTML = `<strong>Bot: </strong>`;
+                document.getElementById('chat-messages').appendChild(responseElement);
             }
+        
+            // Check for complete code blocks in the response buffer
+            const regex = /```(\w+)\n([\s\S]+?)```/g;
+            let match;
+            while ((match = regex.exec(responseBuffer)) !== null) {
+                // Replace code block in the buffer with formatted HTML
+                const formattedCodeBlock = formatCodeBlock(match[1], match[2]);
+                responseBuffer = responseBuffer.replace(match[0], formattedCodeBlock);
+            }
+        
+            // Replace newline characters with <br> for HTML display
+            responseBuffer = responseBuffer.replace(/\n/g, '<br>');
+        
+            // Update the response element's HTML
+            responseElement.innerHTML = `<strong>Bot: </strong>${responseBuffer}`;
         }
+
 
         
         socket.on('chunk', handleChunk);
