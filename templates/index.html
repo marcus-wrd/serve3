@@ -300,7 +300,7 @@
                     responseElement.innerHTML += `${messageBuffer}`;
                     messageBuffer = '';
                 } else {
-                    responseElement.innerHTML += `${escapeHTML(data.output)};
+                    responseElement.innerHTML += `${escapeHTML(data.output)}`;
                     messageBuffer = ''; // Clear the buffer
                 }
             } else {
