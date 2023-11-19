@@ -279,20 +279,25 @@
             const inputElement = document.getElementById('input-message');
             let message = inputElement.value;
             inputElement.value = '';
-
+        
+            // Function to create HTML for code block
+            function formatCodeBlock(code) {
+                return `<div class="message"><pre><code>${code}</code></pre></div>`;
+            }
+        
+            // Function to replace code blocks with formatted HTML
+            function replaceCodeBlocks(text) {
+                const regex = /```(.*?)```/gs;
+                return text.replace(regex, (match, code) => formatCodeBlock(code));
+            }
+        
             // Replace newline characters with <br> for HTML display
             message = message.replace(/\n/g, '<br>');
-
-            // Display the user's message with code block formatting
+        
+            // Format and display the message with code block if present
+            const formattedMessage = replaceCodeBlocks(message);
             const chatMessages = document.getElementById('chat-messages');
-            if (message.startsWith('```') && message.endsWith('```')) {
-                // Extract and display as code block
-                message = message.substring(3, message.length - 3);
-                chatMessages.innerHTML += `<div class="message"><pre><code>${message}</code></pre></div>`;
-            } else {
-                // Display normal message
-                chatMessages.innerHTML += `<div class="message">User: ${message}</div>`;
-            }
+            chatMessages.innerHTML += `<div class="message">${formattedMessage}</div>`;
 
             // Reset the response element for new messages
             responseElement = null;
