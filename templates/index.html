@@ -274,31 +274,48 @@
 
         // Listen for chunks from the server
         socket.on('chunk', handleChunk);
-
+        let messageBuffer = '';
+    
         function sendMessage() {
             const inputElement = document.getElementById('input-message');
             let message = inputElement.value;
             inputElement.value = '';
-        
+    
+            messageBuffer += message;
+    
             // Function to create HTML for code block
             function formatCodeBlock(language, code) {
-                return `<div class="message"><pre><code class="${language}">${code}</code></pre></div>`;
+                return `<div class="message"><pre><code class="${language}">${escapeHTML(code)}</code></pre></div>`;
             }
-        
+    
+            // Escape HTML characters to prevent XSS
+            function escapeHTML(str) {
+                return str
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+    
             // Function to replace code blocks with formatted HTML
             function replaceCodeBlocks(text) {
                 const regex = /```(\w+)\n([\s\S]+?)```/g;
-                return text.replace(regex, (match, language, code) => formatCodeBlock(language, code));
+                return text.replace(regex, (match, language, code) => {
+                    messageBuffer = messageBuffer.replace(match, ''); // Remove processed code block from buffer
+                    return formatCodeBlock(language, code);
+                });
             }
-        
-            // Replace newline characters with <br> for HTML display
-            message = replaceCodeBlocks(message).replace(/\n/g, '<br>');
+    
+            // Replace newline characters with <br> for HTML display, except in code blocks
+            messageBuffer = replaceCodeBlocks(messageBuffer).replace(/\n/g, '<br>');
         
             // Format and display the message with code block if present
             const chatMessages = document.getElementById('chat-messages');
-            chatMessages.innerHTML += `<div class="message">${message}</div>`;
+            chatMessages.innerHTML += `<div class="message">${messageBuffer}</div>`;
     
-            // Reset the response element for new messages
+            // Reset the buffer and response element for new messages
+            messageBuffer = '';
             responseElement = null;
     
             // Emit the prompt to the WebSocket
