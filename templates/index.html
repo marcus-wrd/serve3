@@ -291,11 +291,17 @@
         }
         
         function handleChunk(data) {
+            // Append incoming chunk to the buffer
             messageBuffer += data.output;
         
             // Check if the buffer contains a complete code block
             if (/```(\w+)\n([\s\S]+?)```/g.test(messageBuffer)) {
                 processBuffer();
+            } else {
+                // Display non-code block messages with 'Bot: ' tag
+                const chatMessages = document.getElementById('chat-messages');
+                chatMessages.innerHTML += `<div class="message"><strong>Bot: </strong>${escapeHTML(data.output)}</div>`;
+                messageBuffer = ''; // Clear the buffer
             }
         }
         
@@ -332,17 +338,18 @@
             const inputElement = document.getElementById('input-message');
             let message = inputElement.value;
             inputElement.value = '';
-    
+        
+            // Display the user's message with 'User: ' tag
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML += `<div class="message"><strong>User: </strong>${escapeHTML(message)}</div>`;
+        
             messageBuffer += message;
-    
+        
             // Check if the buffer contains a complete code block
             if (messageBuffer.includes('```')) {
                 processBuffer();
             }
-    
-            // Reset the response element for new messages
-            responseElement = null;
-    
+        
             // Emit the prompt to the WebSocket
             socket.emit('generate', { prompt: `${message}` });
         }
