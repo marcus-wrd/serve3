@@ -281,33 +281,26 @@
             inputElement.value = '';
         
             // Function to create HTML for code block
-            function formatCodeBlock(code) {
-                return `<pre><code>${code}</code></pre>`;
+            function formatCodeBlock(language, code) {
+                return `<div class="message"><pre><code class="${language}">${code}</code></pre></div>`;
             }
         
-            // Extract and temporarily remove code blocks from the message
-            const codeBlocks = [];
-            const codeRegex = /```(.*?)```/gs;
-            message = message.replace(codeRegex, (match, code) => {
-                codeBlocks.push(formatCodeBlock(code));
-                return '<<codeblock>>';
-            });
+            // Function to replace code blocks with formatted HTML
+            function replaceCodeBlocks(text) {
+                const regex = /```(\w+)\n([\s\S]+?)```/g;
+                return text.replace(regex, (match, language, code) => formatCodeBlock(language, code));
+            }
         
             // Replace newline characters with <br> for HTML display
-            message = message.replace(/\n/g, '<br>');
+            message = replaceCodeBlocks(message).replace(/\n/g, '<br>');
         
-            // Reinsert code blocks into the message
-            message = message.split('<<codeblock>>').reduce((acc, segment, i) => {
-                return acc + segment + (codeBlocks[i] || '');
-            }, '');
-        
-            // Display the formatted message
+            // Format and display the message with code block if present
             const chatMessages = document.getElementById('chat-messages');
             chatMessages.innerHTML += `<div class="message">${message}</div>`;
-
+    
             // Reset the response element for new messages
             responseElement = null;
-
+    
             // Emit the prompt to the WebSocket
             socket.emit('generate', { prompt: `${message}` });
         }
