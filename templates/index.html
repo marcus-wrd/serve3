@@ -287,21 +287,19 @@
             if (!responseElement) {
                 responseElement = document.createElement('div');
                 responseElement.className = 'message';
-                responseElement.innerHTML = `<strong>Bot: </strong>`;
                 document.getElementById('chat-messages').appendChild(responseElement);
             }
         
-            // Check for complete code blocks in the response buffer
-            const regex = /```(\w+)\n([\s\S]+?)```/g;
-            let match;
-            while ((match = regex.exec(responseBuffer)) !== null) {
-                // Replace code block in the buffer with formatted HTML
-                const formattedCodeBlock = formatCodeBlock(match[1], match[2]);
-                responseBuffer = responseBuffer.replace(match[0], formattedCodeBlock);
+            // Check if the buffer contains a complete code block
+            if (/```(\w+)\n([\s\S]+?)```/g.test(responseBuffer)) {
+                // Format the code blocks
+                responseBuffer = responseBuffer.replace(/```(\w+)\n([\s\S]+?)```/g, function(match, language, code) {
+                    return formatCodeBlock(language, code);
+                });
+            } else {
+                // Replace newline characters with <br> for non-code text
+                responseBuffer = responseBuffer.replace(/\n/g, '<br>');
             }
-        
-            // Replace newline characters with <br> for HTML display
-            responseBuffer = responseBuffer.replace(/\n/g, '<br>');
         
             // Update the response element's HTML
             responseElement.innerHTML = `<strong>Bot: </strong>${responseBuffer}`;
