@@ -277,12 +277,22 @@
 
         function sendMessage() {
             const inputElement = document.getElementById('input-message');
-            const message = inputElement.value;
+            let message = inputElement.value;
             inputElement.value = '';
 
-            // Display the user's message
+            // Replace newline characters with <br> for HTML display
+            message = message.replace(/\n/g, '<br>');
+
+            // Display the user's message with code block formatting
             const chatMessages = document.getElementById('chat-messages');
-            chatMessages.innerHTML += `<div class="message">User: ${message}</div>`;
+            if (message.startsWith('```') && message.endsWith('```')) {
+                // Extract and display as code block
+                message = message.substring(3, message.length - 3);
+                chatMessages.innerHTML += `<div class="message"><pre><code>${message}</code></pre></div>`;
+            } else {
+                // Display normal message
+                chatMessages.innerHTML += `<div class="message">User: ${message}</div>`;
+            }
 
             // Reset the response element for new messages
             responseElement = null;
