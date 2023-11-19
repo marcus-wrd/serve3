@@ -290,18 +290,17 @@
             messageBuffer = '';
         }
         
-        function handleChunk(data) {
-            // Append incoming chunk to the buffer
-            messageBuffer += data.output;
+        let responseBuffer = '';
         
-            // Check if the buffer contains a complete code block
-            if (/```(\w+)\n([\s\S]+?)```/g.test(messageBuffer)) {
-                processBuffer();
-            } else {
-                // Display non-code block messages with 'Bot: ' tag
+        function handleChunk(data) {
+            // Append incoming chunk to the response buffer
+            responseBuffer += data.output;
+        
+            // Check if the buffer contains a complete code block or the end of the response
+            if (/```(\w+)\n([\s\S]+?)```/g.test(responseBuffer) || data.output.includes("End of Response")) {
                 const chatMessages = document.getElementById('chat-messages');
-                chatMessages.innerHTML += `<div class="message"><strong>Bot: </strong>${escapeHTML(data.output)}</div>`;
-                messageBuffer = ''; // Clear the buffer
+                chatMessages.innerHTML += `<div class="message"><strong>Bot: </strong>${escapeHTML(responseBuffer)}</div>`;
+                responseBuffer = ''; // Clear the response buffer for new messages
             }
         }
         
