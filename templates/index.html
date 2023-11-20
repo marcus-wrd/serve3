@@ -283,7 +283,7 @@
             // Append incoming chunk to the buffer
             responseBuffer += data.output;
         
-            if (!responseElement or responseElement == "") {
+            if (!responseElement || responseElement == "") {
                 responseElement = document.createElement('div');
                 responseElement.className = 'message';
                 document.getElementById('chat-messages').appendChild(responseElement);
