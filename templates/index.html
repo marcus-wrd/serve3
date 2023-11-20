@@ -290,19 +290,23 @@
                 document.getElementById('chat-messages').appendChild(responseElement);
             }
         
-            // Check if the buffer contains a complete code block
-            if (/```(\w+)\n([\s\S]+?)```/g.test(responseBuffer)) {
-                // Format the code blocks
-                responseBuffer = responseBuffer.replace(/```(\w+)\n([\s\S]+?)```/g, function(match, language, code) {
-                    return formatCodeBlock(language, code);
-                });
-            } else {
-                // Replace newline characters with <br> for non-code text
-                responseBuffer = responseBuffer.replace(/\n/g, '<br>');
+            let updatedHTML = '';
+        
+            // Split buffer by code block syntax
+            const parts = responseBuffer.split(/(```\w+\n[\s\S]+?```)/);
+            for (let part of parts) {
+                if (/```(\w+)\n([\s\S]+?)```/.test(part)) {
+                    // Format code block
+                    const match = part.match(/```(\w+)\n([\s\S]+?)```/);
+                    updatedHTML += formatCodeBlock(match[1], match[2]);
+                } else {
+                    // Handle regular text with newlines
+                    updatedHTML += escapeHTML(part).replace(/\n/g, '<br>');
+                }
             }
         
             // Update the response element's HTML
-            responseElement.innerHTML = `<strong>Bot: </strong>${responseBuffer}`;
+            responseElement.innerHTML = `<strong>Bot: </strong>${updatedHTML}`;
         }
 
 
