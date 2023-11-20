@@ -168,6 +168,7 @@
     
     <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
     <script>
+        let responseElement;
         // Tutorial Dialog JavaScript
         const tutorialSteps = [
             {
@@ -277,7 +278,6 @@
         }
         
         let responseBuffer = '';
-        let responseElement;
         
         function handleChunk(data) {
             // Append incoming chunk to the buffer
@@ -306,7 +306,6 @@
         
             // Update the response element's HTML
             responseElement.innerHTML = `<strong>Bot: </strong>${updatedHTML}`;
-            responseElement = "";
         }
 
 
@@ -355,7 +354,7 @@
             if (messageBuffer.includes('```')) {
                 processBuffer();
             }
-        
+            responseElement = "";
             // Emit the prompt to the WebSocket
             socket.emit('generate', { prompt: `${message}` });
         }
