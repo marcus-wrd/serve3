@@ -276,19 +276,17 @@
                 .replace(/'/g, '&#039;');
         }
         
-
         let responseBuffer = '';
         let responseElement;
-        let ongoingResponseElement = null;
         
         function handleChunk(data) {
             // Append incoming chunk to the buffer
             responseBuffer += data.output;
         
-            if (!ongoingResponseElement) {
-                ongoingResponseElement = document.createElement('div');
-                ongoingResponseElement.className = 'message';
-                document.getElementById('chat-messages').appendChild(ongoingResponseElement);
+            if (!responseElement or responseElement == "") {
+                responseElement = document.createElement('div');
+                responseElement.className = 'message';
+                document.getElementById('chat-messages').appendChild(responseElement);
             }
         
             let updatedHTML = '';
@@ -306,8 +304,9 @@
                 }
             }
         
-            // Update the ongoing response element's HTML
-            ongoingResponseElement.innerHTML = `<strong>Bot: </strong>${updatedHTML}`;
+            // Update the response element's HTML
+            responseElement.innerHTML = `<strong>Bot: </strong>${updatedHTML}`;
+            responseElement = "";
         }
 
 
@@ -350,9 +349,15 @@
             const chatMessages = document.getElementById('chat-messages');
             chatMessages.innerHTML += `<div class="message"><strong>User: </strong>${escapeHTML(message)}</div>`;
         
-            // Emit the prompt to the WebSocket and reset response buffer
+            messageBuffer += message;
+        
+            // Check if the buffer contains a complete code block
+            if (messageBuffer.includes('```')) {
+                processBuffer();
+            }
+        
+            // Emit the prompt to the WebSocket
             socket.emit('generate', { prompt: `${message}` });
-            responseBuffer = ''; // Clear the buffer for the next response
         }
 
         function handleFileUpload(event) {
