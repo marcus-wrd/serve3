@@ -279,18 +279,20 @@
 
         let responseBuffer = '';
         let responseElement;
+        let ongoingResponseElement = null;
         
         function handleChunk(data) {
             // Append incoming chunk to the buffer
             responseBuffer += data.output;
         
-            // Create a new response element for each new message
-            let responseElement = document.createElement('div');
-            responseElement.className = 'message';
-            document.getElementById('chat-messages').appendChild(responseElement);
+            if (!ongoingResponseElement) {
+                ongoingResponseElement = document.createElement('div');
+                ongoingResponseElement.className = 'message';
+                document.getElementById('chat-messages').appendChild(ongoingResponseElement);
+            }
         
             let updatedHTML = '';
-
+        
             // Split buffer by code block syntax
             const parts = responseBuffer.split(/(```\w+\n[\s\S]+?```)/);
             for (let part of parts) {
@@ -304,8 +306,8 @@
                 }
             }
         
-            // Update the response element's HTML
-            responseElement.innerHTML = `<strong>Bot: </strong>${updatedHTML}`;
+            // Update the ongoing response element's HTML
+            ongoingResponseElement.innerHTML = `<strong>Bot: </strong>${updatedHTML}`;
         }
 
 
