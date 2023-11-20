@@ -355,6 +355,7 @@
                 processBuffer();
             }
             responseElement = "";
+            responseBuffer = "";
             // Emit the prompt to the WebSocket
             socket.emit('generate', { prompt: `${message}` });
         }
